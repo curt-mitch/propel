@@ -568,6 +568,12 @@ export class Tensor implements types.Storage {
     return ops.slice(this, begin_, size_);
   }
 
+  gather(indices: types.TensorLike, axis = 0): Tensor {
+    const indicesT = this.colocate(indices, "int32");
+    assert(indicesT.rank === 1, "indices must be rank1 int32");
+    return ops.gather(this, indicesT, axis);
+  }
+
   /** Concatenates tensors along the specified axis:
    *
    *    import * as pr from "propel";
