@@ -683,6 +683,30 @@ testDevices(async function api_reshape(tensor, device) {
   ]);
 });
 
+testDevices(async function api_pad(tensor, device) {
+  assertAllEqual(tensor([-1, -2]).pad([[1, 2]]), [0, -1, -2, 0, 0]);
+  const d2 = tensor([
+    [9, 5, 7],
+    [6, 8, 4],
+  ]);
+  const padded = d2.pad([[1, 2], [3, 0]]);
+  assertAllEqual(padded, [
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 9, 5, 7],
+    [0, 0, 0, 6, 8, 4],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+  ]);
+  const padded2 = d2.pad([[1, 2], [0, 0]], 42);
+  assertAllEqual(padded2, [
+    [42, 42, 42],
+    [ 9,  5,  7],
+    [ 6,  8,  4],
+    [42, 42, 42],
+    [42, 42, 42],
+  ]);
+});
+
 testDevices(async function api_expandDims(tensor, device) {
   const a = tensor([[1, 2, 3], [4, 5, 6]]);
   assertAllEqual(a.expandDims(0), [[[1, 2, 3], [4, 5, 6]]]);

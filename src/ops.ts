@@ -498,7 +498,7 @@ export const gather = defFW("gather", (x: Storage, indices: Storage,
   saveForBackward(indices, axis);
   return bo.gather(x, indices, axis);
 });
-defBW("gather", (g: Tensor, indices: number[], axis: number) => {
+defBW("gather", (g: Tensor, indices: Tensor, axis: number) => {
   throw new Error("Not Implemented.");
 });
 
@@ -523,6 +523,14 @@ defBWArgs("concat", (argIndex, g, axis, shapes) => {
   begin[axis] = sliceStart;
   size[axis] = sliceSize;
   return g.slice(begin, size);
+});
+
+export const pad = defFW("pad", (x: Storage, paddings: Array<[number, number]>,
+                                 padValue: number): Storage => {
+  return bo.pad(x, paddings, padValue);
+});
+defBW("pad", (g: Tensor, indices: Tensor, axis: number) => {
+  throw new Error("Not Implemented.");
 });
 
 export let reshape = defFW("reshape", (x, newShape) => {

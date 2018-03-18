@@ -603,6 +603,14 @@ export class Tensor implements types.Storage {
     return this.expandDims(axis).concat(axis, tensors.shift(), ...tensors);
   }
 
+  pad(paddings: Array<[number, number]>, padValue = 0): Tensor {
+    if (paddings.length !== this.rank) {
+      throw Error("paddings argument must be shape [N, 2] where N is the " +
+                  "input rank.");
+    }
+    return ops.pad(this, paddings, padValue);
+  }
+
   /** Reshapes the tensor without changing its data. O(1).
    *
    *    import { range } from "propel";
