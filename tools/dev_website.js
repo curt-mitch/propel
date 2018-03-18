@@ -43,6 +43,7 @@ async function bundler(build) {
     outDir: wdir,
     production: prodFlag,
     publicUrl: "/",
+    souceMaps: false,
     watch: !build
   };
 
