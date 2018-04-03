@@ -283,17 +283,21 @@ export class Cell extends Component<CellProps, CellState> {
 
       this.editor =
         CodeMirror(div => this.input.replaceChild(div, pres[0]), options);
+
+      const runCellAndFocusNext = () => {
+        this.run();
+        this.editor.getInputField().blur();
+        this.focusNext();
+        return true;
+      };
+
       this.editor.setOption("extraKeys", {
-        "Ctrl-Enter": () =>  {
+        "Alt-Enter": runCellAndFocusNext,
+        "Ctrl-Enter": () => {
           this.run();
           return true;
         },
-        "Shift-Enter": () => {
-          this.run();
-          this.editor.getInputField().blur();
-          this.focusNext();
-          return true;
-        },
+        "Shift-Enter": runCellAndFocusNext,
       });
 
       this.editor.on("focus", () => {
@@ -345,7 +349,6 @@ export class Cell extends Component<CellProps, CellState> {
     await delay(100);
     classList.remove("notebook-cell-updating");
     classList.remove("notebook-cell-running");
-
     if (this.props.onRun) this.props.onRun(this.code);
   }
 
