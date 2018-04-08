@@ -20,14 +20,10 @@
 
 import { escape } from "he";
 import { Component, h } from "preact";
-import { OutputHandlerDOM } from "../src/output_handler";
 import {
-  assert,
-  delay,
   randomString,
   URL
 } from "../src/util";
-import { CodeMirrorComponent } from "./codemirror";
 import {
   Avatar,
   GlobalHeader,

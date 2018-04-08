@@ -14,6 +14,15 @@
  */
 
 // Propel Notebook Cell.
+import { Component, h } from "preact";
+import {
+  assert,
+  delay,
+} from "../src/util";
+import { OutputHandlerDOM } from "../src/output_handler";
+import { CodeMirrorComponent } from "./codemirror";
+
+let nextCellId = 1;
 
 export interface CellProps {
   code?: string;
