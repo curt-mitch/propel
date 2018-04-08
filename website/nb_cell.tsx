@@ -14,15 +14,13 @@
  */
 
 // Propel Notebook Cell.
+
 import { Component, h } from "preact";
-import {
-  assert,
-  delay,
-} from "../src/util";
+import { OutputHandlerDOM } from "../src/output_handler";
+import { assert, delay } from "../src/util";
+import { CodeMirrorComponent } from "./codemirror";
 import { normalizeCode } from "./common";
 import { RPC } from "./rpc";
-import { OutputHandlerDOM } from "../src/output_handler";
-import { CodeMirrorComponent } from "./codemirror";
 
 export interface CellProps {
   code?: string;
@@ -30,10 +28,10 @@ export interface CellProps {
   // If onDelete or onInsertCell is null, it hides the button.
   onDelete?: () => void;
   onInsertCell?: () => void;
-  nextCellId: number;
   sandbox?: () => RPC;
-  cellExecuteQueue: Cell[];
+  nextCellId: number;
   prerenderedOutputs: Map<number, string>;
+  cellExecuteQueue: Cell[];
 }
 export interface CellState { }
 

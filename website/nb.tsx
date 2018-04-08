@@ -20,6 +20,7 @@
 
 import { escape } from "he";
 import { Component, h } from "preact";
+import { OutputHandlerDOM } from "../src/output_handler";
 import {
   randomString,
   URL
@@ -32,9 +33,14 @@ import {
   UserMenu,
 } from "./common";
 import * as db from "./db";
+import {
+  Cell,
+  CellProps,
+  CellState,
+  cellTable,
+  lookupCell,
+} from "./nb_cell";
 import { RPC, WindowRPC } from "./rpc";
-import { Cell, CellProps, CellState, lookupCell, cellTable } from './nb_cell';
-import { OutputHandlerDOM } from "../src/output_handler";
 
 export function resetNotebook() {
   destroySandbox();
@@ -145,9 +151,13 @@ export function sandbox(): RPC {
 const cellExecuteQueue: Cell[] = [];
 
 // Convenience function to create Notebook JSX element.
-export function cell(code: string, props: CellProps = { nextCellId: 1, prerenderedOutputs, cellExecuteQueue }): JSX.Element {
-  props.code = code.trim();
-  return <Cell { ...props } />;
+export function cell(code: string, props: CellProps = {
+    nextCellId: 1,
+    prerenderedOutputs,
+    cellExecuteQueue,
+  }): JSX.Element {
+    props.code = code.trim();
+    return <Cell { ...props } />;
 }
 
 export async function drainExecuteQueue() {
@@ -491,10 +501,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             onRun: (updatedCode) => this.onRun(updatedCode, i),
             onDelete,
             onInsertCell: () => this.onInsertCell(i),
-            nextCellId: 1,
             sandbox,
-            cellExecuteQueue,
+            nextCellId: 1,
             prerenderedOutputs,
+            cellExecuteQueue,
           });
         })}
       </div>

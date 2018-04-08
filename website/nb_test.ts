@@ -3,7 +3,7 @@ import { assert, assertEqual, createResolvable } from "../src/util";
 import { testBrowser } from "../tools/tester";
 import * as db from "./db";
 import * as nb from "./nb";
-import { lookupCell } from "./nb_cell"
+import { lookupCell } from "./nb_cell";
 
 testBrowser(async function notebook_NotebookRoot() {
   const mdb = db.enableMock();
