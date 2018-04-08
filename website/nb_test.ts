@@ -3,6 +3,7 @@ import { assert, assertEqual, createResolvable } from "../src/util";
 import { testBrowser } from "../tools/tester";
 import * as db from "./db";
 import * as nb from "./nb";
+import { lookupCell } from "./nb_cell"
 
 testBrowser(async function notebook_NotebookRoot() {
   const mdb = db.enableMock();
@@ -38,9 +39,9 @@ testBrowser(async function notebook_focusNextCell() {
   // Test focusNextCell transitions.
   const cellEls = document.querySelectorAll(".notebook-cell");
   assert(cellEls.length >= 2);
-  const first = nb.lookupCell(cellEls[0].id);
+  const first = lookupCell(cellEls[0].id);
   assert(first != null);
-  const second = nb.lookupCell(cellEls[1].id);
+  const second = lookupCell(cellEls[1].id);
   assert(second != null);
   first.focus();
   assert(cellEls[0].classList.contains("notebook-cell-focus"));

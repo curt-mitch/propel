@@ -33,15 +33,12 @@ import {
 } from "./common";
 import * as db from "./db";
 import { RPC, WindowRPC } from "./rpc";
-import { Cell, CellProps, CellState } from './nb_cell';
-
-const cellTable = new Map<number, Cell>(); // Maps id to Cell.
-let nextCellId = 1;
+import { Cell, CellProps, CellState, lookupCell, cellTable } from './nb_cell';
+import { OutputHandlerDOM } from "../src/output_handler";
 
 export function resetNotebook() {
   destroySandbox();
   cellTable.clear();
-  nextCellId = 1;
 }
 
 const prerenderedOutputs = new Map<number, string>();
@@ -65,20 +62,7 @@ const anonDoc = {
   updated: new Date(),
 };
 
-// Given a cell's id, which can either be an integer or
-// a string of the form "cell5" (where 5 is the id), look up
-// the component in the global table.
-export function lookupCell(id: string | number): Cell {
-  let numId;
-  if (typeof id === "string") {
-    numId = Number(id.replace("cell", ""));
-  } else {
-    numId = id;
-  }
-  return cellTable.get(numId);
-}
-
-export function lookupOutputHandler(id: string | number) {
+export function lookupOutputHandler(id: string | number): OutputHandlerDOM {
   const cell = lookupCell(id);
   return cell.getOutputHandler();
 }
@@ -155,16 +139,16 @@ export function sandbox(): RPC {
   return sandboxRpc;
 }
 
-// Convenience function to create Notebook JSX element.
-export function cell(code: string, props: CellProps = {}): JSX.Element {
-  props.code = code.trim();
-  return <Cell { ...props } />;
-}
-
 // When rendering HTML server-side, all of the notebook cells are executed so
 // their output can be placed in the generated HTML. This queue tracks the
 // execution promises for each cell.
 const cellExecuteQueue: Cell[] = [];
+
+// Convenience function to create Notebook JSX element.
+export function cell(code: string, props: CellProps = { nextCellId: 1, prerenderedOutputs, cellExecuteQueue }): JSX.Element {
+  props.code = code.trim();
+  return <Cell { ...props } />;
+}
 
 export async function drainExecuteQueue() {
   while (cellExecuteQueue.length > 0) {
@@ -507,6 +491,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
             onRun: (updatedCode) => this.onRun(updatedCode, i),
             onDelete,
             onInsertCell: () => this.onInsertCell(i),
+            nextCellId: 1,
+            sandbox,
+            cellExecuteQueue,
+            prerenderedOutputs,
           });
         })}
       </div>

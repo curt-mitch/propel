@@ -19,10 +19,10 @@ import {
   assert,
   delay,
 } from "../src/util";
+import { normalizeCode } from "./common";
+import { RPC } from "./rpc";
 import { OutputHandlerDOM } from "../src/output_handler";
 import { CodeMirrorComponent } from "./codemirror";
-
-let nextCellId = 1;
 
 export interface CellProps {
   code?: string;
@@ -30,6 +30,10 @@ export interface CellProps {
   // If onDelete or onInsertCell is null, it hides the button.
   onDelete?: () => void;
   onInsertCell?: () => void;
+  nextCellId: number;
+  sandbox?: () => RPC;
+  cellExecuteQueue: Cell[];
+  prerenderedOutputs: Map<number, string>;
 }
 export interface CellState { }
 
@@ -44,16 +48,16 @@ export class Cell extends Component<CellProps, CellState> {
 
   constructor(props) {
     super(props);
-    this.id = nextCellId++;
-    if (prerenderedOutputs.has(this.id)) {
-      this.outputHTML = prerenderedOutputs.get(this.id);
+    this.id = props.nextCellId++;
+    if (props.prerenderedOutputs.has(this.id)) {
+      this.outputHTML = props.prerenderedOutputs.get(this.id);
     }
     cellTable.set(this.id, this);
   }
 
   componentWillMount() {
     if (!this.outputHTML) {
-      cellExecuteQueue.push(this);
+      this.props.cellExecuteQueue.push(this);
     }
   }
 
@@ -110,7 +114,7 @@ export class Cell extends Component<CellProps, CellState> {
     const classList = (this.input.parentNode as HTMLElement).classList;
     classList.add("notebook-cell-running");
 
-    await sandbox().call("runCell", this.code, this.id);
+    await this.props.sandbox().call("runCell", this.code, this.id);
 
     classList.add("notebook-cell-updating");
     await delay(100);
@@ -204,4 +208,19 @@ export class Cell extends Component<CellProps, CellState> {
       </div>
     );
   }
+}
+
+export const cellTable = new Map<number, Cell>(); // Maps id to Cell.
+
+// Given a cell's id, which can either be an integer or
+// a string of the form "cell5" (where 5 is the id), look up
+// the component in the global table.
+export function lookupCell(id: string | number): Cell {
+  let numId;
+  if (typeof id === "string") {
+    numId = Number(id.replace("cell", ""));
+  } else {
+    numId = id;
+  }
+  return cellTable.get(numId);
 }
